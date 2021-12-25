@@ -3,9 +3,13 @@ package helper
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"time"
 
 	"github.com/danangkonang/oauth2/config"
 	"github.com/go-oauth2/oauth2/v4"
+	"github.com/go-oauth2/oauth2/v4/models"
 )
 
 // NewMemoryTokenStore create a token store instance based on memory
@@ -18,142 +22,144 @@ func NewFileTokenStore(db *config.DB) (oauth2.TokenStore, error) {
 	return &TokenStore{db: db.Db}, nil
 }
 
-// TokenStore token storage based on buntdb(https://github.com/tidwall/buntdb)
 type TokenStore struct {
 	db *sql.DB
 }
 
-// Create create and store the new token information
-func (ts *TokenStore) Create(ctx context.Context, info oauth2.TokenInfo) error {
-	// ct := time.Now()
-	// jv, err := json.Marshal(info)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// return ts.db.Update(func(tx *buntdb.Tx) error {
-	// 	if code := info.GetCode(); code != "" {
-	// 		_, _, err := tx.Set(code, string(jv), &buntdb.SetOptions{Expires: true, TTL: info.GetCodeExpiresIn()})
-	// 		return err
-	// 	}
-
-	// 	basicID := uuid.Must(uuid.NewRandom()).String()
-	// 	aexp := info.GetAccessExpiresIn()
-	// 	rexp := aexp
-	// 	expires := true
-	// 	if refresh := info.GetRefresh(); refresh != "" {
-	// 		rexp = info.GetRefreshCreateAt().Add(info.GetRefreshExpiresIn()).Sub(ct)
-	// 		if aexp.Seconds() > rexp.Seconds() {
-	// 			aexp = rexp
-	// 		}
-	// 		expires = info.GetRefreshExpiresIn() != 0
-	// 		_, _, err := tx.Set(refresh, basicID, &buntdb.SetOptions{Expires: expires, TTL: rexp})
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 	}
-
-	// 	_, _, err := tx.Set(basicID, string(jv), &buntdb.SetOptions{Expires: expires, TTL: rexp})
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	_, _, err = tx.Set(info.GetAccess(), basicID, &buntdb.SetOptions{Expires: expires, TTL: aexp})
-	// 	return err
-	// })
-	return nil
+type TokenStoreItem struct {
+	ID        int64     `db:"id"`
+	CreatedAt time.Time `db:"created_at"`
+	ExpiredAt time.Time `db:"expired_at"`
+	Code      string    `db:"code"`
+	Access    string    `db:"access"`
+	Refresh   string    `db:"refresh"`
+	Data      string    `db:"data"`
 }
 
-// remove key
-func (ts *TokenStore) remove(key string) error {
+// Create create and store the new token information
+func (ts *TokenStore) Create(ctx context.Context, info oauth2.TokenInfo) error {
+	buf, _ := json.Marshal(info)
+	item := &TokenStoreItem{
+		Data:      string(buf),
+		CreatedAt: time.Now(),
+	}
+
+	if code := info.GetCode(); code != "" {
+		item.Code = code
+		item.ExpiredAt = info.GetCodeCreateAt().Add(info.GetCodeExpiresIn())
+	} else {
+		item.Access = info.GetAccess()
+		item.ExpiredAt = info.GetAccessCreateAt().Add(info.GetAccessExpiresIn())
+
+		if refresh := info.GetRefresh(); refresh != "" {
+			item.Refresh = info.GetRefresh()
+			item.ExpiredAt = info.GetRefreshCreateAt().Add(info.GetRefreshExpiresIn())
+		}
+	}
+
+	_, err := ts.db.Exec(
+		fmt.Sprintf("INSERT INTO %s (created_at, expired_at, code, access, refresh, data) VALUES (?,?,?,?,?,?)", "s.tableName"),
+		item.CreatedAt,
+		item.ExpiredAt,
+		item.Code,
+		item.Access,
+		item.Refresh,
+		item.Data)
+	if err != nil {
+		return err
+	}
 	return nil
-	// err := ts.db.Update(func(tx *buntdb.Tx) error {
-	// 	_, err := tx.Delete(key)
-	// 	return err
-	// })
-	// if err == buntdb.ErrNotFound {
-	// 	return nil
-	// }
-	// return err
 }
 
 // RemoveByCode use the authorization code to delete the token information
 func (ts *TokenStore) RemoveByCode(ctx context.Context, code string) error {
-	return ts.remove(code)
+	query := fmt.Sprintf("DELETE FROM %s WHERE code=? LIMIT 1", "s.tableName")
+	_, err := ts.db.Exec(query, code)
+	if err != nil && err == sql.ErrNoRows {
+		return nil
+	}
+	return err
 }
 
 // RemoveByAccess use the access token to delete the token information
 func (ts *TokenStore) RemoveByAccess(ctx context.Context, access string) error {
-	return ts.remove(access)
+	query := fmt.Sprintf("DELETE FROM %s WHERE access=? LIMIT 1", "s.tableName")
+	_, err := ts.db.Exec(query, access)
+	if err != nil && err == sql.ErrNoRows {
+		return nil
+	}
+	return err
 }
 
 // RemoveByRefresh use the refresh token to delete the token information
 func (ts *TokenStore) RemoveByRefresh(ctx context.Context, refresh string) error {
-	return ts.remove(refresh)
+	query := fmt.Sprintf("DELETE FROM %s WHERE refresh=? LIMIT 1", "s.tableName")
+	_, err := ts.db.Exec(query, refresh)
+	if err != nil && err == sql.ErrNoRows {
+		return nil
+	}
+	return err
 }
 
-func (ts *TokenStore) getData(key string) (oauth2.TokenInfo, error) {
+func (ts *TokenStore) getData(data string) (oauth2.TokenInfo, error) {
 	var ti oauth2.TokenInfo
-	// err := ts.db.View(func(tx *buntdb.Tx) error {
-	// 	jv, err := tx.Get(key)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	var tm models.Token
-	// 	err = json.Unmarshal([]byte(jv), &tm)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	ti = &tm
-	// 	return nil
-	// })
-	// if err != nil {
-	// 	if err == buntdb.ErrNotFound {
-	// 		return nil, nil
-	// 	}
-	// 	return nil, err
-	// }
+	var tm models.Token
+	json.Unmarshal([]byte(data), &tm)
+	ti = &tm
 	return ti, nil
-}
-
-func (ts *TokenStore) getBasicID(key string) (string, error) {
-	var basicID string
-	// err := ts.db.View(func(tx *buntdb.Tx) error {
-	// 	v, err := tx.Get(key)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	basicID = v
-	// 	return nil
-	// })
-	// if err != nil {
-	// 	if err == buntdb.ErrNotFound {
-	// 		return "", nil
-	// 	}
-	// 	return "", err
-	// }
-	return basicID, nil
 }
 
 // GetByCode use the authorization code for token information data
 func (ts *TokenStore) GetByCode(ctx context.Context, code string) (oauth2.TokenInfo, error) {
-	return ts.getData(code)
+	if code == "" {
+		return nil, nil
+	}
+
+	query := fmt.Sprintf("SELECT data FROM %s WHERE code=? LIMIT 1", "s.tableName")
+	var item TokenStoreItem
+	err := ts.db.QueryRow(query, code).Scan(&item.Data)
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil
+	case err != nil:
+		return nil, err
+	}
+
+	return ts.getData(item.Data)
 }
 
 // GetByAccess use the access token for token information data
 func (ts *TokenStore) GetByAccess(ctx context.Context, access string) (oauth2.TokenInfo, error) {
-	basicID, err := ts.getBasicID(access)
-	if err != nil {
+	if access == "" {
+		return nil, nil
+	}
+
+	query := fmt.Sprintf("SELECT * FROM %s WHERE access=? LIMIT 1", "s.tableName")
+	var item TokenStoreItem
+	err := ts.db.QueryRow(query, access).Scan(&item)
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil
+	case err != nil:
 		return nil, err
 	}
-	return ts.getData(basicID)
+	return ts.getData(item.Data)
 }
 
 // GetByRefresh use the refresh token for token information data
 func (ts *TokenStore) GetByRefresh(ctx context.Context, refresh string) (oauth2.TokenInfo, error) {
-	basicID, err := ts.getBasicID(refresh)
-	if err != nil {
+	if refresh == "" {
+		return nil, nil
+	}
+
+	query := fmt.Sprintf("SELECT data FROM %s WHERE refresh=? LIMIT 1", "s.tableName")
+	var item TokenStoreItem
+	err := ts.db.QueryRow(query, refresh).Scan(&item.Data)
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil
+	case err != nil:
 		return nil, err
 	}
-	return ts.getData(basicID)
+	return ts.getData(item.Data)
 }
