@@ -27,7 +27,7 @@ func main() {
 	manager.MustTokenStorage(helper.NewMysqlTokenStore(config.Connection()))
 	manager.MapAccessGenerate(helper.NewAccessGenerate())
 
-	clientStore := helper.NewClientStore()
+	clientStore := helper.NewClientStore(config.Connection())
 	clientStore.Set("client_id", &models.Client{
 		ID:     "client_id",
 		Secret: "client_secret",
