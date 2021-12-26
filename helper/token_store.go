@@ -27,13 +27,13 @@ type TokenStore struct {
 }
 
 type TokenStoreItem struct {
-	ID        int64     `db:"id"`
-	CreatedAt time.Time `db:"created_at"`
-	ExpiredAt time.Time `db:"expired_at"`
-	Code      string    `db:"code"`
-	Access    string    `db:"access"`
-	Refresh   string    `db:"refresh"`
-	Data      string    `db:"data"`
+	ID        int64     `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	ExpiredAt time.Time `json:"expired_at"`
+	Code      string    `json:"code"`
+	Access    string    `json:"access"`
+	Refresh   string    `json:"refresh"`
+	Data      string    `json:"data"`
 }
 
 // Create create and store the new token information
@@ -58,7 +58,7 @@ func (ts *TokenStore) Create(ctx context.Context, info oauth2.TokenInfo) error {
 	}
 
 	_, err := ts.db.Exec(
-		fmt.Sprintf("INSERT INTO %s (created_at, expired_at, code, access, refresh, data) VALUES (?,?,?,?,?,?)", "s.tableName"),
+		fmt.Sprintf("INSERT INTO %s (created_at, expired_at, code, access, refresh, data) VALUES (?,?,?,?,?,?)", "oauth_tokens"),
 		item.CreatedAt,
 		item.ExpiredAt,
 		item.Code,
@@ -73,7 +73,7 @@ func (ts *TokenStore) Create(ctx context.Context, info oauth2.TokenInfo) error {
 
 // RemoveByCode use the authorization code to delete the token information
 func (ts *TokenStore) RemoveByCode(ctx context.Context, code string) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE code=? LIMIT 1", "s.tableName")
+	query := fmt.Sprintf("DELETE FROM %s WHERE code=? LIMIT 1", "oauth_tokens")
 	_, err := ts.db.Exec(query, code)
 	if err != nil && err == sql.ErrNoRows {
 		return nil
@@ -83,7 +83,7 @@ func (ts *TokenStore) RemoveByCode(ctx context.Context, code string) error {
 
 // RemoveByAccess use the access token to delete the token information
 func (ts *TokenStore) RemoveByAccess(ctx context.Context, access string) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE access=? LIMIT 1", "s.tableName")
+	query := fmt.Sprintf("DELETE FROM %s WHERE access=? LIMIT 1", "oauth_tokens")
 	_, err := ts.db.Exec(query, access)
 	if err != nil && err == sql.ErrNoRows {
 		return nil
@@ -93,7 +93,7 @@ func (ts *TokenStore) RemoveByAccess(ctx context.Context, access string) error {
 
 // RemoveByRefresh use the refresh token to delete the token information
 func (ts *TokenStore) RemoveByRefresh(ctx context.Context, refresh string) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE refresh=? LIMIT 1", "s.tableName")
+	query := fmt.Sprintf("DELETE FROM %s WHERE refresh=? LIMIT 1", "oauth_tokens")
 	_, err := ts.db.Exec(query, refresh)
 	if err != nil && err == sql.ErrNoRows {
 		return nil
@@ -115,7 +115,7 @@ func (ts *TokenStore) GetByCode(ctx context.Context, code string) (oauth2.TokenI
 		return nil, nil
 	}
 
-	query := fmt.Sprintf("SELECT data FROM %s WHERE code=? LIMIT 1", "s.tableName")
+	query := fmt.Sprintf("SELECT data FROM %s WHERE code=? LIMIT 1", "oauth_tokens")
 	var item TokenStoreItem
 	err := ts.db.QueryRow(query, code).Scan(&item.Data)
 	switch {
@@ -134,7 +134,7 @@ func (ts *TokenStore) GetByAccess(ctx context.Context, access string) (oauth2.To
 		return nil, nil
 	}
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE access=? LIMIT 1", "s.tableName")
+	query := fmt.Sprintf("SELECT * FROM %s WHERE access=? LIMIT 1", "oauth_tokens")
 	var item TokenStoreItem
 	err := ts.db.QueryRow(query, access).Scan(&item)
 	switch {
@@ -152,7 +152,7 @@ func (ts *TokenStore) GetByRefresh(ctx context.Context, refresh string) (oauth2.
 		return nil, nil
 	}
 
-	query := fmt.Sprintf("SELECT data FROM %s WHERE refresh=? LIMIT 1", "s.tableName")
+	query := fmt.Sprintf("SELECT data FROM %s WHERE refresh=? LIMIT 1", "oauth_tokens")
 	var item TokenStoreItem
 	err := ts.db.QueryRow(query, refresh).Scan(&item.Data)
 	switch {

@@ -28,10 +28,10 @@ type ClientStore struct {
 }
 
 type ClientStoreItem struct {
-	ID     string `db:"id"`
-	Secret string `db:"secret"`
-	Domain string `db:"domain"`
-	Data   string `db:"data"`
+	ID     string `json:"id"`
+	Secret string `json:"secret"`
+	Domain string `json:"domain"`
+	Data   string `json:"data"`
 }
 
 func (cs *ClientStore) toClientInfo(data string) (oauth2.ClientInfo, error) {
@@ -47,7 +47,7 @@ func (cs *ClientStore) GetByID(ctx context.Context, id string) (oauth2.ClientInf
 	}
 
 	var item ClientStoreItem
-	err := cs.db.QueryRow(fmt.Sprintf("SELECT data FROM %s WHERE id = ?", "s.tableName"), id).Scan(&item.Data)
+	err := cs.db.QueryRow(fmt.Sprintf("SELECT data FROM %s WHERE id = ?", "oauth_clients"), id).Scan(&item.Data)
 	switch {
 	case err == sql.ErrNoRows:
 		return nil, nil
@@ -65,7 +65,7 @@ func (cs *ClientStore) Set(id string, cli oauth2.ClientInfo) (err error) {
 		return err
 	}
 
-	_, err = cs.db.Exec(fmt.Sprintf("INSERT INTO %s (id, secret, domain, data) VALUES (?,?,?,?)", "s.tableName"),
+	_, err = cs.db.Exec(fmt.Sprintf("INSERT INTO %s (id, secret, domain, data) VALUES (?,?,?,?)", "oauth_clients"),
 		cli.GetID(),
 		cli.GetSecret(),
 		cli.GetDomain(),
