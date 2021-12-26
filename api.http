@@ -7,7 +7,7 @@ POST http://localhost:9096/v1/oauth/token HTTP/1.1
 Authorization: Basic client_id:client_secret
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=password&username=danang%40email.com&password=testing123&scope=all
+grant_type=password&username=danang&password=test&scope=all
 
 ###
 

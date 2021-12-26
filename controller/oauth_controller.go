@@ -10,6 +10,7 @@ import (
 	"github.com/go-oauth2/oauth2/v4/manage"
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-session/session"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type oauthController struct {
@@ -26,22 +27,20 @@ func NewOauthController(manager *manage.Manager, user service.UserService) *oaut
 
 func (s *oauthController) Login(w http.ResponseWriter, r *http.Request) {
 	s.server.SetUserAuthorizationHandler(userAuthorizeHandler)
-	// var pass string
-	// 	var id int
-	// config.Connection().QueryRow("SELECT id, password from users WHERE user_name = ?", r.FormValue("username")).Scan(&id, &pass)
-	// err_pass := bcrypt.CompareHashAndPassword([]byte(pass), []byte(r.FormValue("password")))
-	// if err_pass != nil {
-	// 	helper.MakeRespon(w, 400, "invalid username or password", nil)
-	// 	return
-	// }
-	// srv.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
-	// 	return strconv.Itoa(id), nil
-	// })
-	s.server.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
-		return "1", nil
-	})
-	err := s.server.HandleTokenRequest(w, r)
+	res, err := s.user.Login(r.FormValue("username"))
 	if err != nil {
+		helper.MakeRespon(w, 500, err.Error(), nil)
+		return
+	}
+	err_pass := bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(r.FormValue("password")))
+	if err_pass != nil {
+		helper.MakeRespon(w, 400, "invalid username or password", nil)
+		return
+	}
+	s.server.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
+		return res.Id, nil
+	})
+	if err := s.server.HandleTokenRequest(w, r); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
