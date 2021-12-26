@@ -9,7 +9,8 @@ func (m *Migration) UpUsers() {
 	query := `
 		CREATE TABLE users(
 			id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			name VARCHAR (225) NOT NULL,
+			user_name VARCHAR (225) NOT NULL,
+			password VARCHAR (225) NOT NULL,
 			created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		)
@@ -19,7 +20,7 @@ func (m *Migration) UpUsers() {
 		fmt.Println(err.Error())
 		os.Exit(0)
 	}
-  fmt.Println(string(Green), "success", string(Reset), "up 0003_migration_users.go")
+	fmt.Println(string(Green), "success", string(Reset), "up 0003_migration_users.go")
 }
 
 func (m *Migration) DownUsers() {
@@ -29,5 +30,5 @@ func (m *Migration) DownUsers() {
 		fmt.Println(err.Error())
 		os.Exit(0)
 	}
-  fmt.Println(string(Green), "success", string(Reset), "down 0003_migration_users.go")
+	fmt.Println(string(Green), "success", string(Reset), "down 0003_migration_users.go")
 }

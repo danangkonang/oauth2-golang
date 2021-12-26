@@ -134,9 +134,9 @@ func (ts *TokenStore) GetByAccess(ctx context.Context, access string) (oauth2.To
 		return nil, nil
 	}
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE access=? LIMIT 1", "oauth_tokens")
+	query := fmt.Sprintf("SELECT data FROM %s WHERE access=? LIMIT 1", "oauth_tokens")
 	var item TokenStoreItem
-	err := ts.db.QueryRow(query, access).Scan(&item)
+	err := ts.db.QueryRow(query, access).Scan(&item.Data)
 	switch {
 	case err == sql.ErrNoRows:
 		return nil, nil

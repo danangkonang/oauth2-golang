@@ -1,0 +1,18 @@
+POST http://localhost:9096/v1/secure HTTP/1.1
+Authorization: Bearer ODk4NjljZjctODdiNS0zNDJhLWJlZTAtOWZiMmUyMzA1NjVm
+
+###
+
+POST http://localhost:9096/v1/oauth/token HTTP/1.1
+Authorization: Basic client_id:client_secret
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=danang%40email.com&password=testing123&scope=all
+
+###
+
+POST http://localhost:9096/v1/oauth/token HTTP/1.1
+Authorization: Basic client_id:client_secret
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token=MDHIM2U3ODGTYTA2MS01ZTLMLWE1YZMTMWVJM2ZKMJI5NGNK
