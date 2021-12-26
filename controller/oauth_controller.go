@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/danangkonang/oauth2/helper"
+	"github.com/danangkonang/oauth2/service"
 	"github.com/go-oauth2/oauth2/v4/manage"
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-session/session"
@@ -13,11 +14,13 @@ import (
 
 type oauthController struct {
 	server *server.Server
+	user   service.UserService
 }
 
-func NewOauthController(manager *manage.Manager) *oauthController {
+func NewOauthController(manager *manage.Manager, user service.UserService) *oauthController {
 	return &oauthController{
 		server: server.NewServer(server.NewConfig(), manager),
+		user:   user,
 	}
 }
 

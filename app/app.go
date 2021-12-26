@@ -28,7 +28,8 @@ func Run() {
 	manager.MapClientStorage(clientStore)
 
 	r := mux.NewRouter()
-	router.OauthRouter(r, manager)
+	router.OauthRouter(r, manager, config.Connection())
+	router.UserRouter(r, config.Connection())
 
 	log.Printf("running on %s:%d%s", "http://localhost", 9096, "/oauth/token")
 	server := &http.Server{
