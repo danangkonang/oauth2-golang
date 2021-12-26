@@ -9,6 +9,7 @@ func (m *Migration) UpUsers() {
 	query := `
 		CREATE TABLE users(
 			id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			client_id VARCHAR (225) NOT NULL,
 			user_name VARCHAR (225) NOT NULL,
 			password VARCHAR (225) NOT NULL,
 			created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

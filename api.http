@@ -16,3 +16,16 @@ Authorization: Basic client_id:client_secret
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=refresh_token&refresh_token=MDHIM2U3ODGTYTA2MS01ZTLMLWE1YZMTMWVJM2ZKMJI5NGNK
+
+###
+
+POST http://localhost:9096/v1/user/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "client_id": "client_id",
+  "user_name": "danang",
+  "password": "test"
+}
+
+###
