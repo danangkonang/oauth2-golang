@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/danangkonang/oauth2/config"
+	"github.com/danangkonang/oauth2-golang/config"
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/models"
 )

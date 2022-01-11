@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/danangkonang/oauth2/app"
+	"github.com/danangkonang/oauth2-golang/app"
 	"github.com/joho/godotenv"
 )
 

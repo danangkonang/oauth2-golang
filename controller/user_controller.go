@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/danangkonang/oauth2/helper"
-	"github.com/danangkonang/oauth2/model"
-	"github.com/danangkonang/oauth2/service"
+	"github.com/danangkonang/oauth2-golang/helper"
+	"github.com/danangkonang/oauth2-golang/model"
+	"github.com/danangkonang/oauth2-golang/service"
 )
 
 type userController struct {

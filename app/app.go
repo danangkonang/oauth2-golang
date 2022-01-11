@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/danangkonang/oauth2/config"
-	"github.com/danangkonang/oauth2/helper"
-	"github.com/danangkonang/oauth2/router"
+	"github.com/danangkonang/oauth2-golang/config"
+	"github.com/danangkonang/oauth2-golang/helper"
+	"github.com/danangkonang/oauth2-golang/router"
 	"github.com/go-oauth2/oauth2/v4/manage"
 	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/gorilla/mux"
@@ -15,7 +15,12 @@ import (
 
 func Run() {
 	manager := manage.NewDefaultManager()
-	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
+	// manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
+	manager.SetAuthorizeCodeTokenCfg(&manage.Config{
+		AccessTokenExp:    time.Minute * 1,
+		RefreshTokenExp:   time.Minute * 2,
+		IsGenerateRefresh: true,
+	})
 	manager.MustTokenStorage(helper.NewMysqlTokenStore(config.Connection()))
 	manager.MapAccessGenerate(helper.NewAccessGenerate())
 

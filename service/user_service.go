@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/danangkonang/oauth2/config"
-	"github.com/danangkonang/oauth2/model"
+	"github.com/danangkonang/oauth2-golang/config"
+	"github.com/danangkonang/oauth2-golang/model"
 )
 
 type UserService interface {

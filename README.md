@@ -1,17 +1,31 @@
 # Oauth2 Golang Mysql
 
+- Mysql to store token
+
 ## install
 
 ```bash
-git clone https://github.com/danangkonang/oauth2.git
+git clone https://github.com/danangkonang/oauth2-golang.git
 
-cd oauth2
+cd oauth2-golang
 
 go mod tidy
 
-docker-compose up --build -d
+#database(optional)
+docker-compose up -d
 
 ./gomigrator up migration
 
 go run main.go
+```
+
+## response
+
+```json
+{
+  "access_token": "sDrk..",
+  "token_type": "Bearer",
+  "refresh_token": "jkudy8..",
+  "expiry": 7195,
+}
 ```

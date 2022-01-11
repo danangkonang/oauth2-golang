@@ -9,8 +9,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/danangkonang/oauth2/db/migration"
-	"github.com/danangkonang/oauth2/db/seeder"
+	"github.com/danangkonang/oauth2-golang/db/migration"
+	"github.com/danangkonang/oauth2-golang/db/seeder"
 	"github.com/joho/godotenv"
 )
 
@@ -150,7 +150,7 @@ func main() {
 		hlp := &Helper{
 			Version: "1.1.1",
 		}
-		printTemplate(versionTmp, hlp)	
+		printTemplate(versionTmp, hlp)
 	}
 	var t Tables
 	up := flag.NewFlagSet("up", flag.ExitOnError)
@@ -335,4 +335,3 @@ func seederUp(t *Tables) {
 		meth.Call(nil)
 	}
 }
-

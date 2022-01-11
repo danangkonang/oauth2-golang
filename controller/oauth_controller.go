@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/danangkonang/oauth2/helper"
-	"github.com/danangkonang/oauth2/service"
+	"github.com/danangkonang/oauth2-golang/helper"
+	"github.com/danangkonang/oauth2-golang/service"
 	"github.com/go-oauth2/oauth2/v4/manage"
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-session/session"
