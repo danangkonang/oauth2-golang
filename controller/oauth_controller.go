@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -48,7 +47,6 @@ func (s *oauthController) Login(w http.ResponseWriter, r *http.Request) {
 func (s *oauthController) Secure(w http.ResponseWriter, r *http.Request) {
 	token, err := s.server.ValidationBearerToken(r)
 	if err != nil {
-		fmt.Println(err.Error())
 		helper.MakeRespon(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}

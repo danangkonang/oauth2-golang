@@ -1,5 +1,5 @@
 POST http://localhost:9096/v1/secure HTTP/1.1
-Authorization: Bearer ODk4NjljZjctODdiNS0zNDJhLWJlZTAtOWZiMmUyMzA1NjVm
+Authorization: Bearer YTQ3YWQ4MzYtYTY3MC0zYWYzLWE2MjYtNzcwZTZlYTM5NTRm
 
 ###
 
