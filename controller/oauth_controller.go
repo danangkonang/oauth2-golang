@@ -1,11 +1,13 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/danangkonang/oauth2-golang/helper"
 	"github.com/danangkonang/oauth2-golang/service"
+	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/manage"
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-session/session"
@@ -25,20 +27,27 @@ func NewOauthController(manager *manage.Manager, user service.UserService) *oaut
 }
 
 func (s *oauthController) Login(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(time.Now())
 	s.server.SetUserAuthorizationHandler(userAuthorizeHandler)
-	res, err := s.user.Login(r.FormValue("username"))
-	if err != nil {
-		helper.MakeRespon(w, 500, err.Error(), nil)
-		return
+	gt := oauth2.GrantType(r.FormValue("grant_type"))
+	if gt.String() == "" {
+		helper.MakeRespon(w, 500, "unsupport grant type", nil)
 	}
-	err_pass := bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(r.FormValue("password")))
-	if err_pass != nil {
-		helper.MakeRespon(w, 400, "invalid username or password", nil)
-		return
+	if gt == oauth2.PasswordCredentials {
+		res, err := s.user.Login(r.FormValue("username"))
+		if err != nil {
+			helper.MakeRespon(w, 500, err.Error(), nil)
+			return
+		}
+		err_pass := bcrypt.CompareHashAndPassword([]byte(res.Password), []byte(r.FormValue("password")))
+		if err_pass != nil {
+			helper.MakeRespon(w, 400, "invalid username or password", nil)
+			return
+		}
+		s.server.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
+			return res.Id, nil
+		})
 	}
-	s.server.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
-		return res.Id, nil
-	})
 	if err := s.server.HandleTokenRequest(w, r); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -15,7 +15,6 @@ import (
 
 func Run() {
 	manager := manage.NewDefaultManager()
-	// manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
 	manager.SetAuthorizeCodeTokenCfg(&manage.Config{
 		AccessTokenExp:    time.Minute * 1,
 		RefreshTokenExp:   time.Minute * 2,

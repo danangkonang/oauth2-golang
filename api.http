@@ -1,8 +1,10 @@
+# @name secure
 POST http://localhost:9096/v1/secure HTTP/1.1
-Authorization: Bearer YTQ3YWQ4MzYtYTY3MC0zYWYzLWE2MjYtNzcwZTZlYTM5NTRm
+Authorization: Bearer NWNhYjQ3YjYtZmQ4ZS0zMmY1LWE0NGUtYzBhMDEzNDk4Njcz
 
 ###
 
+# @name password
 POST http://localhost:9096/v1/oauth/token HTTP/1.1
 Authorization: Basic client_id:client_secret
 Content-Type: application/x-www-form-urlencoded
@@ -11,14 +13,16 @@ grant_type=password&username=danang&password=test&scope=all
 
 ###
 
+# @name refresh_token
 POST http://localhost:9096/v1/oauth/token HTTP/1.1
 Authorization: Basic client_id:client_secret
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=refresh_token&refresh_token=MDHIM2U3ODGTYTA2MS01ZTLMLWE1YZMTMWVJM2ZKMJI5NGNK
+grant_type=refresh_token&refresh_token=MDU0MzdlNGYtOWQ2NS01YTVhLTk3Y2EtYjk3YjRlZThjYjA2
 
 ###
 
+# @name register
 POST http://localhost:9096/v1/user/register HTTP/1.1
 Content-Type: application/json
 

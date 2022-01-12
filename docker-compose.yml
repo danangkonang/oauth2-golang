@@ -13,6 +13,7 @@ services:
       - MYSQL_USER=danang
       - MYSQL_PASSWORD=danang
       - MYSQL_DATABASE=oauth2
+      - TZ=Asia/Jakarta
     volumes: 
       - ./data-mysql:/var/lib/mysql
     container_name: mysql-db

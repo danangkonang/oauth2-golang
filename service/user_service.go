@@ -30,7 +30,6 @@ func (c *connUser) Register(m *model.UserRegister) error {
 	`
 	_, err := c.Psql.Exec(query, m.ClientId, m.UserName, m.Password, m.CreatedAt, m.UpdatedAt)
 	if err != nil {
-		fmt.Println(err.Error())
 		return errors.New("INTERNAL_SERVER_ERROR")
 	}
 	return nil
@@ -47,6 +46,7 @@ func (c *connUser) Login(user string) (*model.Autorization, error) {
 	case err == sql.ErrNoRows:
 		return nil, errors.New("invalid username")
 	case err != nil:
+		fmt.Println(err.Error())
 		return nil, errors.New("INTERNAL_SERVER_ERROR")
 	}
 	return usr, nil
