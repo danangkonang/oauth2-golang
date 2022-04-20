@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/danangkonang/oauth2-golang/helper"
 	"github.com/danangkonang/oauth2-golang/service"
@@ -27,8 +25,7 @@ func NewOauthController(manager *manage.Manager, user service.UserService) *oaut
 }
 
 func (s *oauthController) Login(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(time.Now())
-	s.server.SetUserAuthorizationHandler(userAuthorizeHandler)
+	// s.server.SetUserAuthorizationHandler(userAuthorizeHandler)
 	gt := oauth2.GrantType(r.FormValue("grant_type"))
 	if gt.String() == "" {
 		helper.MakeRespon(w, 500, "unsupport grant type", nil)
@@ -54,18 +51,18 @@ func (s *oauthController) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *oauthController) Secure(w http.ResponseWriter, r *http.Request) {
-	token, err := s.server.ValidationBearerToken(r)
-	if err != nil {
-		helper.MakeRespon(w, http.StatusUnauthorized, "Unauthorized", nil)
-		return
-	}
-	ut := time.Now()
-	data := map[string]interface{}{
-		"expires_in": int64(token.GetAccessCreateAt().Add(token.GetAccessExpiresIn()).Sub(ut).Seconds()),
-		"client_id":  token.GetClientID(),
-		"user_id":    token.GetUserID(),
-	}
-	helper.MakeRespon(w, 200, "success", data)
+	// token, err := s.server.ValidationBearerToken(r)
+	// if err != nil {
+	// 	helper.MakeRespon(w, http.StatusUnauthorized, "Unauthorized", nil)
+	// 	return
+	// }
+	// ut := time.Now()
+	// data := map[string]interface{}{
+	// 	"expires_in": int64(token.GetAccessCreateAt().Add(token.GetAccessExpiresIn()).Sub(ut).Seconds()),
+	// 	"client_id":  token.GetClientID(),
+	// 	"user_id":    token.GetUserID(),
+	// }
+	helper.MakeRespon(w, 200, "success", nil)
 }
 
 func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string, err error) {

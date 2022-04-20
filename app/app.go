@@ -15,11 +15,12 @@ import (
 
 func Run() {
 	manager := manage.NewDefaultManager()
-	manager.SetAuthorizeCodeTokenCfg(&manage.Config{
-		AccessTokenExp:    time.Minute * 1,
-		RefreshTokenExp:   time.Minute * 2,
+	cfg := &manage.Config{
+		AccessTokenExp:    time.Hour * 1,
+		RefreshTokenExp:   time.Hour * 24 * 7,
 		IsGenerateRefresh: true,
-	})
+	}
+	manager.SetPasswordTokenCfg(cfg)
 	manager.MustTokenStorage(helper.NewMysqlTokenStore(config.Connection()))
 	manager.MapAccessGenerate(helper.NewAccessGenerate())
 
