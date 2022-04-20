@@ -28,6 +28,10 @@ func (c *userController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
+	if err := c.Service.IsUserAlrady(user.UserName); err != nil {
+		helper.MakeRespon(w, 500, err.Error(), nil)
+		return
+	}
 	hashPass := helper.HashPassword(user.Password)
 	user.Password = hashPass
 	user.CreatedAt = time.Now()

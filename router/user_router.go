@@ -8,9 +8,9 @@ import (
 )
 
 func UserRouter(router *mux.Router, db *config.DB) {
-	rest := controller.NewUserController(
+	c := controller.NewUserController(
 		service.NewServiceUser(db),
 	)
 	v1 := router.PathPrefix("/v1").Subrouter()
-	v1.HandleFunc("/user/register", rest.Register).Methods("POST")
+	v1.HandleFunc("/user/register", c.Register).Methods("POST")
 }

@@ -24,7 +24,7 @@ func NewOauthController(manager *manage.Manager, user service.UserService) *oaut
 	}
 }
 
-func (s *oauthController) Login(w http.ResponseWriter, r *http.Request) {
+func (s *oauthController) Token(w http.ResponseWriter, r *http.Request) {
 	// s.server.SetUserAuthorizationHandler(userAuthorizeHandler)
 	gt := oauth2.GrantType(r.FormValue("grant_type"))
 	if gt.String() == "" {
