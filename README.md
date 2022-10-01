@@ -14,7 +14,7 @@ go mod tidy
 #database(optional)
 docker-compose up -d
 
-./gomigrator up migration
+make up
 
 go run main.go
 ```
